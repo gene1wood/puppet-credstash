@@ -1,0 +1,20 @@
+{
+  "name": "gene1wood-credstash",
+  "version": "0.5.0",
+  "author": "Gene Wood",
+  "license": "MPL-2.0",
+  "summary": "Module to deploy credstash and create custom facts",
+  "source": "https://github.com/gene1wood/puppet-credstash",
+  "project_page": "https://github.com/gene1wood/puppet-credstash",
+  "issues_url": "https://github.com/gene1wood/puppet-credstash/issues/",
+  "tags": ["aws", "ec2", "credstash", "secrets", "security"],
+  "operatingsystem_support": [
+    {
+    "operatingsystem":"RedHat",
+    "operatingsystemrelease":[ "7", "6" ]
+    }
+   ],
+  "dependencies": [
+    { "name": "stankevich/python", "version_requirement": ">=1.9.4" }
+  ]
+}
