@@ -79,40 +79,54 @@ Include the module [as you would any other] [7]
 
 ##Usage
 
-To use a credential fetched by puppet-credstash use the `$credstash` fact. 
-
-###Puppet 3.x
+You can access credstash credentials with puppet-credstash in three ways. The
+method you should use depends on your puppet version and settings.
 
 With puppet 3.x, non-string facts, like the `$credstash` hash, are [converted to
-strings] [8].
+strings] [8] unless you have configured puppet to not convert facts to strings with the
+[`stringify_facts`] [9] configuration setting. 
 
-There are two methods to handle non-string facts in Puppet 3.x
+###get_credential function
 
-You can configure puppet to not convert facts to strings with the
-[stringify_facts] [9] configuration setting.
+This method works with Puppet 3.x and 4.x regardless of settings and is the
+preferred method to fetch credstash credentials.
 
-You can parse the "stringified" `$credstash` fact in your puppet manifest with
-the [parsejson] [10] function provided by the [puppetlabs-stdlib] [11] module.
-To do this you would need to install the puppet-stdlib module and use the
-`parsejson` function like this
+To fetch a credential call the [`get_credential`](#function-get_credential) function
 
 ~~~puppet
-  class example() {
-    $credstash_secrets = parsejson($credstash)
-    $app_password = $credstash_secrets['app_password']
+  class example(
+    $app_password = get_credential('app_password'),
+    $db_password = get_credential('myapp:prod:db:password')
+  ) {
     file { '/etc/app.conf':
       content => template('example/app.conf.erb'),
     }
   }
+~~~~~~
+
+###Individual credstash facts
+
+This method works with Puppet 3.x and 4.x regardless of settings.
+
+Every available credstash credential is surfaced in its own facter fact.
+The name of the credential is [sanitized] [13] into a valid puppet variable name and
+prefixed with `credstash_`.
+
+~~~puppet
+  $one = $credstash_app_password             # From credstash['app_password']
+  $two = $credstash_myapp_prod_db_password   # From credstash['myapp:prod:db:password']
+  $three = $credstash_myapp_prod_db_password # From credstash['myapp:prod:db:password']
 ~~~
 
-###Puppet 4.x
+###credstash fact
 
-The fetched credentials are stored in the `$credstash` hash. Access them like this
+This method only works with Puppet 4.x or with Puppet 3.x with [`stringify_facts`] [9] set to
+`false`.
 
 ~~~puppet
   class example() {
     $app_password = $credstash['app_password']
+    $db_password = $credstash['myapp:prod:db:password']
     file { '/etc/app.conf':
       content => template('example/app.conf.erb'),
     }
@@ -121,11 +135,6 @@ The fetched credentials are stored in the `$credstash` hash. Access them like th
 
 ##Reference
 
-Here, list the classes, types, providers, facts, etc contained in your module.
-This section should include all of the under-the-hood workings of your module so
-people know what the module is touching on their system but don't need to mess
-with things. (We are working on automating this section!)
-
 Classes:
 
 * [credstash](#class-credstash)
@@ -133,6 +142,12 @@ Classes:
 Facts:
 
 * [credstash](#fact-credstash)
+
+Functions:
+
+* [get_credential](#function-get_credential)
+* [destringify](#function-destringify)
+* [unescape](#function-unescape)
 
 Prerequisites:
 
@@ -159,6 +174,53 @@ of credentials names and secrets (or a stringified hash in Puppet 3.x).
     {"app_password"  => "s3cret",
      "cookie_secret" => "52af5423-3593-4d70-9a98-2ee2e5d9ad08"}
 ~~~
+
+###Function: get_credential
+
+A function which returns a credstash credential value for the name passed to
+the function. If the credstash facter fact is a string (due to running under
+Puppet 3.x), the string is destringified first into a hash. Next
+`get_credential` fetches the credential from the hash and finally unescapes
+the credential value and returns it.
+
+~~~puppet
+  class example(
+    $app_password = get_credential('app_password'),
+  ) {
+    file { '/etc/app.conf':
+      content => template('example/app.conf.erb'),
+    }
+  }
+~~~
+
+###Function: destringify
+
+A function which converts a puppet stringified object back into the
+structured data object it originated as. `destringify` does this by
+converting the string into a JSON readable format using regular expressions
+and then JSON parsing the resulting string. The object is returned.
+
+~~~puppet
+  class example() {
+    $credentials = destringify($credstash)
+    $app_password_escaped = $credentials['app_password']
+    $app_password = unescape($app_password_escaped)
+    file { '/etc/app.conf':
+      content => template('example/app.conf.erb'),
+    }
+  }
+~~~
+
+['get_credential'](#function-get_credential) uses `destringify` to access
+the stringified credstash hash.
+
+###Function: unescape
+
+A function that converts an escaped string into an unescaped string. 
+`unescape` accepts an escaped string as an argument and returns the unescaped
+string.
+
+See the [destringify example](#function-destringify) above.
 
 ###Prerequisite: AWS state
 
@@ -214,3 +276,4 @@ welcome.
 [10]: https://forge.puppetlabs.com/puppetlabs/stdlib#parsejson "parsejson function"
 [11]: https://forge.puppetlabs.com/puppetlabs/stdlib "puppet-stdlib module"
 [12]: https://github.com/gene1wood/puppet-credstash "puppet-credstash module"
+[13]: https://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#regular-expressions-for-variable-names "Puppet allowed characters for variable names"
