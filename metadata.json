@@ -1,6 +1,6 @@
 {
   "name": "gene1wood-credstash",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": "Gene Wood",
   "license": "MPL-2.0",
   "summary": "Module to deploy credstash and create custom facts",
@@ -15,6 +15,6 @@
     }
    ],
   "dependencies": [
-    { "name": "stankevich/python", "version_requirement": ">=1.9.4" }
+    { "name": "stankevich/python", "version_requirement": "1.9.x" }
   ]
 }

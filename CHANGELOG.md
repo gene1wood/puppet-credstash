@@ -1,3 +1,14 @@
+#2015-06-11 - Release 0.6.2
+## Summary
+
+Install OS package prerequisites instead of depending on pip.
+
+#2015-06-11 - Release 0.6.1
+## Summary
+
+Handle absent puppet-credstash config file and credstash binary gracefully. 
+Documentation cleanup.
+
 #2015-06-09 - Release 0.6.0
 ## Summary
 
