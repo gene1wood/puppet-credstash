@@ -27,6 +27,8 @@ module Facter::Util::Credstash
       if File.exist?(config_file)
         require 'yaml'
         config = YAML.load_file(config_file)
+      else
+        config = {}
       end
       Facter.debug "Config loaded: #{config}"
   
@@ -39,7 +41,11 @@ module Facter::Util::Credstash
       Facter.debug "Executing command : #{command}"
       # Note : Puppet 3.x stringifies hashed facts by default whereas Puppet 4.x does not
       # see https://docs.puppetlabs.com/references/3.8.latest/configuration.html#stringifyfacts
-      JSON.parse(Facter::Core::Execution.exec(command))
+      begin
+        JSON.parse(Facter::Core::Execution.exec(command))
+      rescue
+        {}
+      end
     end
 
     ##

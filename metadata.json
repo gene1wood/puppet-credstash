@@ -1,6 +1,6 @@
 {
   "name": "gene1wood-credstash",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": "Gene Wood",
   "license": "MPL-2.0",
   "summary": "Module to deploy credstash and create custom facts",

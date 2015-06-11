@@ -1,13 +1,13 @@
-#puppet-credstash
+#credstash
 
 ####Table of Contents
 
 1. [Overview](#overview)
 2. [Module Description - What the module does and why it is useful](#module-description)
-3. [Setup - The basics of getting started with puppet-credstash](#setup)
-    * [What puppet-credstash affects](#what-puppet-credstash-affects)
+3. [Setup - The basics of getting started with the credstash module](#setup)
+    * [What the credstash module affects](#what-the-credstash-module-affects)
     * [Setup requirements](#setup-requirements)
-    * [Beginning with puppet-credstash](#beginning-with-puppet-credstash)
+    * [Beginning with the credstash module](#beginning-with-the-credstash-module)
 4. [Usage - Configuration options and additional functionality](#usage)
 5. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 5. [Limitations - OS compatibility, etc.](#limitations)
@@ -15,22 +15,22 @@
 
 ##Overview
 
-puppet-credstash installs [credstash] [1] and surfaces all accessible credstash
-credentials as a facter fact. puppet-credstash works on Puppet 3.x/4.x under
+The credstash module installs [credstash] [1] and surfaces all accessible credstash
+credentials as a facter fact. The credstash module works on Puppet 3.x/4.x under
 Debian or RedHat based systems.
 
 ##Module Description
 
-puppet-credstash creates a custom fact containing a hash (or stringified hash in
+The credstash module creates a custom fact containing a hash (or stringified hash in
 Puppet 3.x) of all stored credentials in a [credstash] [1] credential store.
 This enables you to access previously stored credentials easily in your puppet
 manifests.
 
-puppet-credstash also installs credstash using pip.
+The credstash module also installs credstash using pip.
 
 ##Setup
 
-###What puppet-credstash affects
+###What the credstash module affects
 
 * Installs python and python-pip through it's dependence on the 
 [puppet-python] [2] module
@@ -38,12 +38,12 @@ puppet-credstash also installs credstash using pip.
 
 ###Setup Requirements
 
-puppet-credstash reads an optional configuration file located at `/etc/puppet-
-credstash.yaml`. This configuration file allows you to pass optional
-configuration options to credstash. The file is a YAML hash/dictionary of
-settings.
+The credstash module reads an optional configuration file located at 
+`/etc/puppet-credstash.yaml`. This configuration file allows you to pass 
+optional configuration options to credstash. The file is a YAML 
+hash/dictionary of settings.
 
-As this configuration file is consumed by the puppet-credstash custom fact it
+As this configuration file is consumed by the credstash module custom fact it
 must be created before puppet runs, not by puppet.
 
 #### region
@@ -73,13 +73,13 @@ fetching credentials. Each Encryption Context is in the form of `key=value`
     - product=MyApp
 ~~~
 
-###Beginning with puppet-credstash
+###Beginning with the credstash module
 
-Include the module [as you would any other] [7]
+Include the module [as you would any other] [7].
 
 ##Usage
 
-You can access credstash credentials with puppet-credstash in three ways. The
+You can access credstash credentials with the credstash module in three ways. The
 method you should use depends on your puppet version and settings.
 
 With puppet 3.x, non-string facts, like the `$credstash` hash, are [converted to
@@ -142,6 +142,7 @@ Classes:
 Facts:
 
 * [credstash](#fact-credstash)
+* [credstash_example](#fact-credstash_example)
 
 Functions:
 
@@ -174,6 +175,13 @@ of credentials names and secrets (or a stringified hash in Puppet 3.x).
     {"app_password"  => "s3cret",
      "cookie_secret" => "52af5423-3593-4d70-9a98-2ee2e5d9ad08"}
 ~~~
+
+###Fact: credstash_example
+
+Every credential is surfaced as a Facter fact with a name based on the
+credential name. `$credstash['example']` would be available as
+`$credstash_example`. Each credential name is [sanitized] [13] into a valid
+puppet variable name and prefixed with `credstash_`.
 
 ###Function: get_credential
 
@@ -211,7 +219,7 @@ and then JSON parsing the resulting string. The object is returned.
   }
 ~~~
 
-['get_credential'](#function-get_credential) uses `destringify` to access
+[`get_credential`](#function-get_credential) uses `destringify` to access
 the stringified credstash hash.
 
 ###Function: unescape
@@ -226,13 +234,13 @@ See the [destringify example](#function-destringify) above.
 
 [credstash] [1] uses either IAM policy permissions or KMS Grants to decrypt the
 encrypted credentials from the DynamoDB table. Without these permissions,
-puppet-credstash will return no credentials as credstash won't have access to
+The credstash module will return no credentials as credstash won't have access to
 any. To learn more about the permissions needed by credstash visit the
 [credstash site] [1]
 
 ###Prerequisite: Configuration file
 
-The puppet-credstash configuration file, `/etc/puppet-credstash.yaml` is
+The credstash module configuration file, `/etc/puppet-credstash.yaml` is
 optional. If you're using a non-default AWS region or DynamoDB table name you
 will need to set this in this configuration file. If you're using Encryption
 Contexts to control access to your stored credentials, you will need to set the
@@ -240,23 +248,23 @@ contexts in this configuration file.
 
 ###Prerequisite: Stored credentials
 
-puppet-credstash fetches and decrypts credentials. These credentials must have
+The credstash module fetches and decrypts credentials. These credentials must have
 previously been encrypted and uploaded with credstash.
 
 ##Limitations
 
-puppet-credstash has been tested on RedHat based systems and should also work
+The credstash module has been tested on RedHat based systems and should also work
 under Debian systems.
 
 Currently, credstash 1.3.1 does not store the encryption contexts used for 
 encryption when credentials are stored. As a result, in order for
-puppet-credstash to fetch credentials with credstash, that encryption context
-must be provided in the puppet-credstash configuration file. Since the
-puppet-credstash configuration file must be present *before* facter runs and
+the credstash module to fetch credentials with credstash, that encryption context
+must be provided in the credstash module configuration file. Since the
+credstash module configuration file must be present *before* facter runs and
 as a result *before* puppet runs, it would have to be made available by being
 burned into the AMI, written by a `user_data` driven script or by some other
 non-puppet means. This is not ideal. Once credstash supports recording of
-encryption contexts, this dependence on a puppet-credstash configuration file
+encryption contexts, this dependence on a credstash module configuration file
 can be removed.
 
 ##Development
@@ -275,5 +283,5 @@ welcome.
 [9]: https://docs.puppetlabs.com/puppet/3.8/reference/deprecated_settings.html#stringifyfacts--true "stringify_facts"
 [10]: https://forge.puppetlabs.com/puppetlabs/stdlib#parsejson "parsejson function"
 [11]: https://forge.puppetlabs.com/puppetlabs/stdlib "puppet-stdlib module"
-[12]: https://github.com/gene1wood/puppet-credstash "puppet-credstash module"
+[12]: https://github.com/gene1wood/puppet-credstash "credstash module"
 [13]: https://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#regular-expressions-for-variable-names "Puppet allowed characters for variable names"
