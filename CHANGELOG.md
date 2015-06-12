@@ -1,3 +1,8 @@
+#2015-06-11 - Release 0.6.3
+## Summary
+
+Linting and adding EPEL dependency to workaround [puppet-python bug](https://github.com/stankevich/puppet-python/issues/196)
+
 #2015-06-11 - Release 0.6.2
 ## Summary
 
