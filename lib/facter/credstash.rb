@@ -17,8 +17,20 @@ module Facter::Util::Credstash
 
     def get_credstash_credentials
       config_file = '/etc/puppet-credstash.yaml'
-      bin = '/usr/local/bin/credstash'
-    
+      case Facter.value(:osfamily)
+      when 'Debian'
+        bin = '/usr/local/bin/credstash'
+      when 'RedHat'
+        case Facter.value(:os)['name']
+        when 'CentOS'
+          bin = '/usr/bin/credstash'
+        when  'Amazon'
+          bin = '/usr/local/bin/credstash'
+        else
+          bin = '/usr/bin/credstash'
+        end
+      end
+
       if File.exist?(config_file)
         require 'yaml'
         config = YAML.load_file(config_file)
