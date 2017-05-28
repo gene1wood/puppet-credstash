@@ -1,5 +1,5 @@
-## 
-# A facter fact to make all credstash stored secrets available as both a 
+##
+# A facter fact to make all credstash stored secrets available as both a
 # hashed fact for Puppet 4.x as well as individual string facts for puppet
 # 3.x
 
@@ -21,9 +21,16 @@ module Facter::Util::Credstash
       when 'Debian'
         bin = '/usr/local/bin/credstash'
       when 'RedHat'
-        bin = '/usr/bin/credstash'
+        case Facter.value(:os)['name']
+        when 'CentOS'
+          bin = '/usr/bin/credstash'
+        when  'Amazon'
+          bin = '/usr/local/bin/credstash'
+        else
+          bin = '/usr/bin/credstash'
+        end
       end
-    
+
       if File.exist?(config_file)
         require 'yaml'
         config = YAML.load_file(config_file)
@@ -31,13 +38,13 @@ module Facter::Util::Credstash
         config = {}
       end
       Facter.debug "Config loaded: #{config}"
-  
+
       command = bin
       command += config.has_key?('region') ? " --region #{config['region']}" : ""
       command += config.has_key?('table') ? " --table #{config['table']}" : ""
       command += " getall"
       command += config.has_key?('context') ? " " + config['context'].join(" ") : ""
-      
+
       Facter.debug "Executing command : #{command}"
       # Note : Puppet 3.x stringifies hashed facts by default whereas Puppet 4.x does not
       # see https://docs.puppetlabs.com/references/3.8.latest/configuration.html#stringifyfacts
