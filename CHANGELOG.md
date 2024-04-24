@@ -1,3 +1,8 @@
+# 2024-04-24 - Release 1.0.0
+## Summary
+
+Converting to Puppet 4.x API
+
 # 2017-05-27 - Release 0.6.4
 ## Summary
 

@@ -2,7 +2,6 @@
 class credstash(
   $credstash_package = 'credstash',
 ) {
-  include 'epel' # Workaround for bug https://github.com/stankevich/puppet-python/issues/196
   include 'python'
   $python_yaml_package_name = $::osfamily ? {
     'redhat' => 'PyYAML',
@@ -19,8 +18,7 @@ class credstash(
     require => [
       Class['python'],
       Package['python-yaml'],
-      Package['python-crypto'],
-      Class['epel'],
+      Package['python-crypto']
     ]
   }
 }
