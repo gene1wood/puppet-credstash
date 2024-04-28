@@ -8,11 +8,15 @@ class credstash(
     'debian' => 'python-yaml',
   }
 
-  package { 'python-yaml' :
-    name => $python_yaml_package_name,
+  if !defined(Package['python-yaml']) {
+    package { 'python-yaml' :
+      name => $python_yaml_package_name,
+    }
   }
 
-  package { 'python-crypto' : }
+  if !defined(Package['python-crypto']) {
+    package { 'python-crypto' : }
+  }
 
   python::pip { $credstash_package :
     require => [
