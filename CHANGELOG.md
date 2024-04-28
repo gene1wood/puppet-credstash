@@ -1,3 +1,9 @@
+# 2024-04-27 - Release 1.0.1
+## Summary
+
+Only load the python-yaml and python-crypto packages if they aren't already
+loaded. Thanks @mattyo161
+
 # 2024-04-24 - Release 1.0.0
 ## Summary
 
